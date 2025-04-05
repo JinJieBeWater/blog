@@ -1,9 +1,9 @@
 ---
-title: "T3 Stack集成测试系列1: 基础环境搭建与tRPC后端路由测试"
+title: "Next.js/T3 Stack集成测试系列1: 基础环境搭建与tRPC后端路由测试"
 pubDate: "2025-04-05"
-description: "从零搭建T3 Stack测试环境，验证tRPC基础路由功能"
-categories: ["技术实践","全栈开发"]
-tags: ["T3 Stack", "tRPC", "单元测试", "TypeScript", "vitest", "drizzle"]
+description: "从零搭建Next.js/T3 Stack测试环境，验证tRPC基础路由功能"
+categories: ["Next.js"]
+tags: ["T3 Stack", "Next.js", "tRPC", "单元测试", "TypeScript", "vitest", "drizzle"]
 ---
 
 ## 引言
@@ -371,7 +371,7 @@ vi.mock('react', async (importOriginal) => {
 经过以上流程，现在已经可以做到对trpc的router进行测试。
 不过为了不污染数据库，在测试环境下，我们应该另外使用测试专业数据库进行测试。
 
-请看 T3 Stack 集成测试系列2 搭建专用测试数据库环境
+请看 Next.js/T3 Stack集成测试系列2 搭建专用测试数据库环境
 
 还没写
 
