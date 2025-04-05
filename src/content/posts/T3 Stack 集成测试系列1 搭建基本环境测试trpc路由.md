@@ -369,7 +369,7 @@ vi.mock('react', async (importOriginal) => {
 ## 总结
 
 经过以上流程，现在已经可以做到对trpc的router进行测试。
-不过为了不污染数据库，在测试环境下，我们应该另外使用测试专业数据库进行测试。
+不过为了不污染数据库，在测试环境下，我们应该另外使用测试专用数据库进行测试。
 
 请看 Next.js/T3 Stack集成测试系列2 搭建专用测试数据库环境
 
@@ -377,7 +377,7 @@ vi.mock('react', async (importOriginal) => {
 
 ## 相关链接
 
-[vitest](https://cn.vitest.dev/)
+[示例仓库](https://github.com/JinJieBeWater/my-vitest-tests)
 
 [nextjs test-environment-variables](https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables#test-environment-variables)
 
