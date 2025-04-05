@@ -32,7 +32,7 @@ pnpm create t3-app@latest my-vitest-tests
 - Will you be using TypeScript or JavaScript?
   - TypeScript
 - Will you be using Tailwind CSS for styling?
-  - Yes  
+  - Yes
 - Would you like to use tRPC?
   - Yes
 - What authentication provider would you like to use?
@@ -66,65 +66,66 @@ pnpm create t3-app@latest my-vitest-tests
 我们的目的是为后端trpc路由集成测试，因此不跟随 Next.js 官方的[文档](https://nextjs.org/docs/app/building-your-application/testing/vitest)文档走
 
 ### 1. 安装vitest
+
 ```base
 pnpm add -D vitest
 ```
 
 ### 2. 新建 vitest.config.mts 配置文件
+
 ```typescript
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-	test: {
-		server: {
-			deps: {
-				inline: ["next"],
-			},
-		},
-	},
-	resolve: {
-		alias: {
-			"@": "/src",
-		},
-	},
-});
-
+  test: {
+    server: {
+      deps: {
+        inline: ['next'],
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
+})
 ```
 
 ### 3. 添加基础测试用例
+
 新建 `src\test\server\trpc\post.test.ts` 文件用于编写测试用例。
 
 ```typescript
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from 'vitest'
 
-describe("post router", () => {
-	it("returns the correct greeting", async () => {
-		const greeting = ({ text }: { text: string }) => ({
-			greeting: `Hello ${text}`,
-		});
-		const result = greeting({
-			text: "vitest",
-		});
-		expect(result).toMatchObject({ greeting: "Hello vitest" });
-	});
-});
-
+describe('post router', () => {
+  it('returns the correct greeting', async () => {
+    const greeting = ({ text }: { text: string }) => ({
+      greeting: `Hello ${text}`,
+    })
+    const result = greeting({
+      text: 'vitest',
+    })
+    expect(result).toMatchObject({ greeting: 'Hello vitest' })
+  })
+})
 ```
 
 ### 4. 添加执行脚本
+
 ```json
 {
-	"scripts": {
+  "scripts": {
     // ... 省略
-		"test": "vitest"
-	}
+    "test": "vitest"
+  }
 }
 ```
 
 ### 5. 运行 `pnpm run test`
 
-![!\[alt text\](image.png)
-](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/base-test.png>)
+![![alt text](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/base-test.png>)
 
 如果出现上图内容，则 `vitest` 就安装完成了。
 
@@ -144,15 +145,15 @@ describe("post router", () => {
  * handling a tRPC call from a React Server Component.
  */
 const createContext = cache(async () => {
-	const heads = new Headers(await headers());
-	heads.set("x-trpc-source", "rsc");
+  const heads = new Headers(await headers())
+  heads.set('x-trpc-source', 'rsc')
 
-	return createTRPCContext({
-		headers: heads,
-	});
-});
+  return createTRPCContext({
+    headers: heads,
+  })
+})
 
-const caller = createCaller(createContext);
+const caller = createCaller(createContext)
 ```
 
 只需要传入上下文，即可实现路由的调用
@@ -160,32 +161,31 @@ const caller = createCaller(createContext);
 在 `src\server\api\trpc.ts` 下有createTRPCContext的定义
 
 ```typescript
-export const createTRPCContext = async (opts: { headers: Headers }) => {
-	const session = await auth();
+export async function createTRPCContext(opts: { headers: Headers }) {
+  const session = await auth()
 
-	return {
-		db,
-		session,
-		...opts,
-	};
-};
-
+  return {
+    db,
+    session,
+    ...opts,
+  }
+}
 ```
 
 在该函数下添加 `createContextInner` 用于测试环境下的上下文创建
+
 ```typescript
 export function createContextInner(opts: {
-	session: Session | null;
-	db?: typeof db;
+  session: Session | null
+  db?: typeof db
 }) {
-	const headers = new Headers();
-	return {
-		db: opts.db ?? db,
-		headers,
-		...opts,
-	};
+  const headers = new Headers()
+  return {
+    db: opts.db ?? db,
+    headers,
+    ...opts,
+  }
 }
-
 ```
 
 测试环境下没有客户端传过来的headers，因此需要手动 new 一个
@@ -193,65 +193,58 @@ export function createContextInner(opts: {
 新建 `src\test\server\trpc\utils\setupTrpc.ts` 用于创建caller
 
 ```typescript
-import { createContextInner } from "@/server/api/trpc";
-import { createCaller } from "@/server/api/root";
-import type { Session } from "next-auth";
-import { db } from "@/server/db";
+import type { Session } from 'next-auth'
+import { createCaller } from '@/server/api/root'
+import { createContextInner } from '@/server/api/trpc'
+import { db } from '@/server/db'
 
 export async function setupTrpc() {
-	const ctx = createContextInner({
-		session: null,
-		db: db,
-	});
-	const caller = createCaller(ctx);
+  const ctx = createContextInner({
+    session: null,
+    db,
+  })
+  const caller = createCaller(ctx)
 
-	return { caller, db };
+  return { caller, db }
 }
 
 export async function setupAuthorizedTrpc({
-	session,
+  session,
 }: {
-	session: Session | null;
+  session: Session | null
 }) {
-	const ctx = createContextInner({
-		session,
-		db: db,
-	});
-	const caller = createCaller(ctx);
+  const ctx = createContextInner({
+    session,
+    db,
+  })
+  const caller = createCaller(ctx)
 
-	return { callerAuthorized: caller, db };
+  return { callerAuthorized: caller, db }
 }
-
 ```
 
 然后在 `src\test\server\trpc\post.test.ts` 下使用
 
 ```typescript
-import { describe, expect, it } from "vitest";
-import { setupTrpc } from "./utils/setupTrpc";
+import { describe, expect, it } from 'vitest'
+import { setupTrpc } from './utils/setupTrpc'
 
-describe("post router", async () => {
-	const { caller } = await setupTrpc();
-	it("returns the correct greeting", async () => {
-		const result = await caller.post.hello({
-			text: "vitest",
-		});
-		expect(result).toMatchObject({ greeting: "Hello vitest" });
-	});
-});
-
-
+describe('post router', async () => {
+  const { caller } = await setupTrpc()
+  it('returns the correct greeting', async () => {
+    const result = await caller.post.hello({
+      text: 'vitest',
+    })
+    expect(result).toMatchObject({ greeting: 'Hello vitest' })
+  })
+})
 ```
 
 此时运行vitest，会遇到以下问题
 
-![!\[alt text\](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/env-err.png>)
+![![alt text](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/env-err.png>)
 
-
-
-
-
-### 2. env 
+### 2. env
 
 该错误由[t3-env](https://github.com/t3-oss/t3-env)抛出。
 这是一个类型安全访问环境变量的方案，由于我们导入了`@/server/db`下的db，此部分会取出`.env`中的`DATABASE_URL`连接数据库。
@@ -268,59 +261,60 @@ pnpm i @next/env -D
 ```
 
 并在vitest.config.mts 文件中加载
-```typescript
-import { defineConfig } from "vitest/config";
-import nextEnv from "@next/env";
 
-nextEnv.loadEnvConfig(process.cwd());
+```typescript
+import nextEnv from '@next/env'
+import { defineConfig } from 'vitest/config'
+
+nextEnv.loadEnvConfig(process.cwd())
 
 export default defineConfig({
-	test: {
-		server: {
-			deps: {
-				inline: ["next"],
-			},
-		},
-	},
-	resolve: {
-		alias: {
-			"@": "/src",
-		},
-	},
-});
-
+  test: {
+    server: {
+      deps: {
+        inline: ['next'],
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
+})
 ```
+
 再次运行vitest，运行成功
 
-![!\[alt text\](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/base-test-with-router.png>)
+![![alt text](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/base-test-with-router.png>)
 
 ### 3. 添加受保护路由测试
 
 ```typescript
-it("returns the correct greeting", async () => {
-		const result = await caller.post.hello({
-			text: "vitest",
-		});
-		expect(result).toMatchObject({ greeting: "Hello vitest" });
-	});
+it('returns the correct greeting', async () => {
+  const result = await caller.post.hello({
+    text: 'vitest',
+  })
+  expect(result).toMatchObject({ greeting: 'Hello vitest' })
+})
 
-	it("throws an error if not logged in", async () => {
-		await expect(() =>
-			caller.post.getSecretMessage(),
-		).rejects.toThrowErrorMatchingInlineSnapshot("[TRPCError: UNAUTHORIZED]");
-	});
+it('throws an error if not logged in', async () => {
+  await expect(() =>
+    caller.post.getSecretMessage(),
+  ).rejects.toThrowErrorMatchingInlineSnapshot('[TRPCError: UNAUTHORIZED]')
+})
 
-	it("returns the secret message if logged in", async () => {
-		const example = await callerAuthorized.post.getSecretMessage();
-		expect(example).toMatchInlineSnapshot(
-			`"you can now see this secret message!"`,
-		);
-	});
+it('returns the secret message if logged in', async () => {
+  const example = await callerAuthorized.post.getSecretMessage()
+  expect(example).toMatchInlineSnapshot(
+    `"you can now see this secret message!"`,
+  )
+})
 ```
 
 运行通过
 
-![\[!\\[alt text\\](image.png)\](<T3 Stack 集成测试系列1 搭建基本环境测试trpc路由.md>)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/base-test-with-protected-router.png>)
+![[![alt text](image.png)](<T3 Stack 集成测试系列1 搭建基本环境测试trpc路由.md>)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/base-test-with-protected-router.png>)
 
 ### 4. 可能出现的问题
 
@@ -328,49 +322,49 @@ it("returns the correct greeting", async () => {
 但如果是在以前创建的t3项目，大概是t3没有升级到react19之前，可能会出现以下问题。
 
 #### 1.Next Auth Error
-![!\[alt text\](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/err-next-auth.png>)
+
+![![alt text](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/err-next-auth.png>)
+
 ####
 
-
 这可以通过配置vitest的Vite-node server options选项解决
+
 ```typescript
 export default defineConfig({
   // ... 省略
-	test: {
-		server: {
-			deps: {
-				inline: ["next"],
-			},
-		},
-	},
-	
-});
+  test: {
+    server: {
+      deps: {
+        inline: ['next'],
+      },
+    },
+  },
 
+})
 ```
 
 #### 2.err-(0 , cache) is not a function
-![!\[alt text\](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/err-(0 , cache) is not a function.png>)
+
+![![alt text](image.png)](<../image/T3 Stack 集成测试系列1 搭建基本环境测试trpc路由/err-(0 , cache) is not a function.png>)
 这似乎会出现在 react canary 版本中，我们可以Vitest的mock功能来模拟React模块，添加这个函数的定义。
 
 创建 `src\test\setup.ts` 文件，添加以下内容
 
 ```typescript
-import { vi } from "vitest";
+import { vi } from 'vitest'
 
-vi.mock("react", async (importOriginal) => {
-	const testCache = <T extends (...args: Array<unknown>) => unknown>(func: T) =>
-		func;
-	const originalModule = await importOriginal<typeof import("react")>();
-	return {
-		...originalModule,
-		cache: testCache,
-	};
-});
-
+vi.mock('react', async (importOriginal) => {
+  const testCache = <T extends (...args: Array<unknown>) => unknown>(func: T) =>
+    func
+  const originalModule = await importOriginal<typeof import('react')>()
+  return {
+    ...originalModule,
+    cache: testCache,
+  }
+})
 ```
 
 这应该可以解决问题
-
 
 ## 总结
 
@@ -387,6 +381,6 @@ vi.mock("react", async (importOriginal) => {
 
 [nextjs test-environment-variables](https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables#test-environment-variables)
 
-[TypeError: (0 , _react.cache) is not a function #49304](https://github.com/vercel/next.js/discussions/49304)
+[TypeError: (0 , \_react.cache) is not a function #49304](https://github.com/vercel/next.js/discussions/49304)
 
 [Next Auth Error](https://github.com/nextauthjs/next-auth/discussions/9385#discussioncomment-11064988)
