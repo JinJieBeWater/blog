@@ -192,6 +192,9 @@ export function createContextInner(opts: {
 
 新建 `src\test\server\trpc\utils\setupTrpc.ts` 用于创建caller
 
+注意，现在是导入了 `@/server/db`下的db，调用会出现报错，提示无法连接到数据库，当前仍未解决。
+在下一章使用专用数据库会创建专门用于测试的db实例，即可略过这个问题。
+
 ```typescript
 import type { Session } from 'next-auth'
 import { createCaller } from '@/server/api/root'
@@ -230,8 +233,8 @@ import { describe, expect, it } from 'vitest'
 import { setupTrpc } from './utils/setupTrpc'
 
 describe('post router', async () => {
-  const { caller } = await setupTrpc()
   it('returns the correct greeting', async () => {
+    const { caller } = await setupTrpc()
     const result = await caller.post.hello({
       text: 'vitest',
     })
@@ -291,20 +294,15 @@ export default defineConfig({
 ### 3. 添加受保护路由测试
 
 ```typescript
-it('returns the correct greeting', async () => {
-  const result = await caller.post.hello({
-    text: 'vitest',
-  })
-  expect(result).toMatchObject({ greeting: 'Hello vitest' })
-})
-
 it('throws an error if not logged in', async () => {
+  const { caller } = await setupTrpc()
   await expect(() =>
     caller.post.getSecretMessage(),
   ).rejects.toThrowErrorMatchingInlineSnapshot('[TRPCError: UNAUTHORIZED]')
 })
 
 it('returns the secret message if logged in', async () => {
+  const { callerAuthorized } = await setupAuthorizedTrpc()
   const example = await callerAuthorized.post.getSecretMessage()
   expect(example).toMatchInlineSnapshot(
     `"you can now see this secret message!"`,
