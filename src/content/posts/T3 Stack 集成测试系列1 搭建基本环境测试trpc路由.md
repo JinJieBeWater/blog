@@ -211,11 +211,16 @@ export function setupTrpc() {
   return { caller, ctx }
 }
 
+interface SetupAuthorizedTrpcProps {
+  session?: Session
+}
+
 export function setupAuthorizedTrpc({
-  session,
-}: {
-  session: Session | null
-}) {
+  session = {
+    user: { id: '1', name: 'test' },
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24).toString(),
+  },
+}: SetupAuthorizedTrpcProps = {}) {
   const ctx = createContextInner({
     session,
     db,
