@@ -182,8 +182,8 @@ export function createContextInner(opts: {
   const headers = new Headers()
   return {
     db: opts.db ?? db,
+    session: opts.session,
     headers,
-    ...opts,
   }
 }
 ```
