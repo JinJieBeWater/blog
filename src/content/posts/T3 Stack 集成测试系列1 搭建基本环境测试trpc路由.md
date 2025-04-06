@@ -399,12 +399,10 @@ export default defineConfig({
 
 [示例仓库](https://github.com/JinJieBeWater/my-vitest-tests)
 
+[vitest](https://cn.vitest.dev/)
+
 [nextjs test-environment-variables](https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables#test-environment-variables)
 
 [TypeError: (0 , \_react.cache) is not a function #49304](https://github.com/vercel/next.js/discussions/49304)
 
 [Next Auth Error](https://github.com/nextauthjs/next-auth/discussions/9385#discussioncomment-11064988)
-
-```
-
-```
