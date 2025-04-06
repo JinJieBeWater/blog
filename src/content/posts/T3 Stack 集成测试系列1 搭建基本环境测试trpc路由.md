@@ -201,17 +201,17 @@ import { createCaller } from '@/server/api/root'
 import { createContextInner } from '@/server/api/trpc'
 import { db } from '@/server/db'
 
-export async function setupTrpc() {
+export function setupTrpc() {
   const ctx = createContextInner({
     session: null,
     db,
   })
   const caller = createCaller(ctx)
 
-  return { caller, db }
+  return { caller, ctx }
 }
 
-export async function setupAuthorizedTrpc({
+export function setupAuthorizedTrpc({
   session,
 }: {
   session: Session | null
@@ -222,7 +222,7 @@ export async function setupAuthorizedTrpc({
   })
   const caller = createCaller(ctx)
 
-  return { callerAuthorized: caller, db }
+  return { callerAuthorized: caller, ctx }
 }
 ```
 
@@ -234,7 +234,7 @@ import { setupTrpc } from './utils/setupTrpc'
 
 describe('post router', async () => {
   it('returns the correct greeting', async () => {
-    const { caller } = await setupTrpc()
+    const { caller } = setupTrpc()
     const result = await caller.post.hello({
       text: 'vitest',
     })
@@ -295,14 +295,14 @@ export default defineConfig({
 
 ```typescript
 it('throws an error if not logged in', async () => {
-  const { caller } = await setupTrpc()
+  const { caller } = setupTrpc()
   await expect(() =>
     caller.post.getSecretMessage(),
   ).rejects.toThrowErrorMatchingInlineSnapshot('[TRPCError: UNAUTHORIZED]')
 })
 
 it('returns the secret message if logged in', async () => {
-  const { callerAuthorized } = await setupAuthorizedTrpc()
+  const { callerAuthorized } = setupAuthorizedTrpc()
   const example = await callerAuthorized.post.getSecretMessage()
   expect(example).toMatchInlineSnapshot(
     `"you can now see this secret message!"`,
