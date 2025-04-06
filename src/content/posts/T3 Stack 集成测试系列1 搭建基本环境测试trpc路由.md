@@ -362,6 +362,28 @@ vi.mock('react', async (importOriginal) => {
 })
 ```
 
+然后在 `vitest.config.mts` 配置一下
+
+```typescript
+export default defineConfig({
+  test: {
+    setupFiles: ['./src/test/setup.ts'],
+    server: {
+      deps: {
+        inline: ['next'],
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
+})
+```
+
+该文件现在会在所有测试之前执行。
+
 这应该可以解决问题
 
 ## 总结
@@ -382,3 +404,7 @@ vi.mock('react', async (importOriginal) => {
 [TypeError: (0 , \_react.cache) is not a function #49304](https://github.com/vercel/next.js/discussions/49304)
 
 [Next Auth Error](https://github.com/nextauthjs/next-auth/discussions/9385#discussioncomment-11064988)
+
+```
+
+```
