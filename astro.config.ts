@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config'
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
+import icon from 'astro-icon'
 import playformInline from '@playform/inline'
 import remarkMath from 'remark-math'
 import remarkDirective from 'remark-directive'
@@ -34,6 +35,11 @@ export default defineConfig({
     rehypePlugins: [rehypeKatex, rehypeCleanup, rehypeImageProcessor, rehypeCopyCode]
   },
   integrations: [
+    icon({
+      include: {
+        lucide: ['mail', 'map-pin', 'github']
+      }
+    }),
     playformInline({
       Exclude: [(file) => file.toLowerCase().includes('katex')]
     }),

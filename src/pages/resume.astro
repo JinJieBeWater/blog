@@ -1,0 +1,331 @@
+---
+import { Icon } from 'astro-icon/components'
+import { themeConfig } from '@/config'
+import { resumeData } from '@/data/resume'
+import IndexLayout from '@/layouts/IndexLayout.astro'
+
+const title = `${resumeData.name}${resumeData.role} | ${themeConfig.site.title}`
+const description = `${resumeData.name}的结构化简历页面`
+
+const contactIconNames = {
+  email: 'lucide:mail',
+  phone: 'lucide:phone',
+  location: 'lucide:map-pin',
+  github: 'lucide:github'
+} as const
+---
+
+<IndexLayout title={title} description={description}>
+  <section class="resume-page" aria-label="Resume">
+    <header class="resume-hero">
+      <h1 class="resume-title">
+        {resumeData.name}
+        <span>—{resumeData.role}</span>
+      </h1>
+
+      <ul class="contact-list" aria-label="联系方式">
+        {
+          resumeData.contacts.map((contact) => (
+            <li class="contact-item">
+              <span class="contact-icon" aria-hidden="true">
+                <Icon name={contactIconNames[contact.type]} class="contact-icon-svg" />
+              </span>
+              {contact.href ? (
+                <a href={contact.href} target={contact.type === 'github' ? '_blank' : undefined} rel="noreferrer">
+                  {contact.label}
+                </a>
+              ) : (
+                <span>{contact.label}</span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+
+    <section class="resume-section" aria-labelledby="education-heading">
+      <div class="section-heading">
+        <h2 id="education-heading">教育经历</h2>
+      </div>
+
+      <div class="section-body">
+        {
+          resumeData.education.map((item) => (
+            <article class="education-item">
+              <div class="entry-head">
+                <h3>{item.school}</h3>
+                <p class="entry-period">{item.period}</p>
+              </div>
+              <p class="entry-meta">{item.degree}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="resume-section" aria-labelledby="skills-heading">
+      <div class="section-heading">
+        <h2 id="skills-heading">技能</h2>
+      </div>
+
+      <div class="section-body">
+        <ul class="skill-list">
+          {
+            resumeData.skills.map((skill) => (
+              <li>{skill}</li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="resume-section" aria-labelledby="projects-heading">
+      <div class="section-heading">
+        <h2 id="projects-heading">项目经历</h2>
+      </div>
+
+      <div class="section-body project-list">
+        {
+          resumeData.projects.map((project) => (
+            <article class="project-item">
+              <div class="entry-head">
+                <h3>
+                  {project.name}（{project.role}）
+                </h3>
+                <p class="entry-period">{project.period}</p>
+              </div>
+
+              {(project.backend || project.frontend) && (
+                <ul class="stack-list">
+                  {project.backend && (
+                    <li class="stack-item">
+                      <span>后端：</span>
+                      {project.backend}
+                    </li>
+                  )}
+
+                  {project.frontend && (
+                    <li class="stack-item">
+                      <span>前端：</span>
+                      {project.frontend}
+                    </li>
+                  )}
+                </ul>
+              )}
+
+              <ol class="highlight-list">
+                {
+                  project.highlights.map((highlight) => (
+                    <li>{highlight}</li>
+                  ))
+                }
+              </ol>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+  </section>
+</IndexLayout>
+
+<style>
+  .resume-page {
+    margin-bottom: 1.5rem;
+  }
+
+  .resume-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .resume-title {
+    margin: 0;
+    font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
+    line-height: 1.15;
+    letter-spacing: -0.045em;
+    font-weight: 700;
+  }
+
+  .resume-title span {
+    margin-left: 0.25rem;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .contact-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
+  }
+
+  .contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--text-primary);
+    font-size: var(--font-size-s);
+    line-height: 1.4;
+  }
+
+  .contact-item a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .contact-item a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--text-tertiary);
+  }
+
+  .contact-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.78rem;
+    height: 0.78rem;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+  }
+
+  :global(.contact-icon-svg) {
+    width: 0.78rem;
+    height: 0.78rem;
+  }
+
+  .resume-section {
+    margin-top: 1.2rem;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .section-heading::before {
+    content: '';
+    width: 1.8rem;
+    height: 0.22rem;
+    background: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: var(--font-size-m);
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .section-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .education-item,
+  .project-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+
+  .entry-head h3 {
+    margin: 0;
+    font-size: var(--font-size-m);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .entry-period {
+    margin: 0;
+    flex-shrink: 0;
+    color: var(--text-primary);
+    font-size: var(--font-size-m);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .entry-meta {
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .entry-meta {
+    color: var(--text-secondary);
+  }
+
+  .stack-list {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--text-primary);
+  }
+
+  .stack-item {
+    margin: 0.12rem 0;
+    font-size: var(--font-size-s);
+    line-height: 1.55;
+  }
+
+  .stack-item span {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .skill-list,
+  .highlight-list {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .skill-list li,
+  .highlight-list li {
+    margin: 0.2rem 0;
+  }
+
+  .project-list {
+    gap: 1.2rem;
+  }
+
+  @media (max-width: 640px) {
+    .resume-hero {
+      gap: 0.75rem;
+    }
+
+    .entry-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.15rem;
+    }
+
+    .entry-period {
+      font-size: var(--font-size-s);
+      color: var(--text-secondary);
+    }
+
+    .contact-list {
+      gap: 0.4rem 0.8rem;
+    }
+  }
+</style>
